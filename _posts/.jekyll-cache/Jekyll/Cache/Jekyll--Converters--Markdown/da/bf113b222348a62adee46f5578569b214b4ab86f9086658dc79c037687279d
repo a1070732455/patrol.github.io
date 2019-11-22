@@ -1,0 +1,89 @@
+I"N<blockquote>
+  <p>申明：背景图来自微博@胡歌，侵删～不过胡歌这么可爱应该不会介意的</p>
+</blockquote>
+
+<p>第一个问题：这玩意儿是什么？通俗的来讲：<br />
+<code class="highlighter-rouge">Jekyll = web server + static blog + front end UI</code><br />
+如果你想拥有一个自己的博客但是苦于数据库没学好，你可以来试试看；再如果想学前端，你也可以试试看～</p>
+
+<p>做配置前请默念三遍四者之间的关系，保证倒背如流在进行下一步：</p>
+<pre class="brush:python;toolbar:false">
+1.Ruby 是语言。
+2.gem 是一组 Ruby 程序，类似于「包」的概念。
+3.RubyGems 是 Ruby 的包管理器，用来管理和安装 gems 的。
+4.bundle是用来管理gems的项目，确保能够正确地安装项目依赖，确保能够运行正确的包。
+</pre>
+
+<h2 id="1-rvm-安装">1. RVM 安装</h2>
+<pre class="brush:python;toolbar:false">
+gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+curl -sSL https://get.rvm.io | bash -s stable
+##如果上面秘钥导入失败会提示command建议，直接复制下来，实在不行找不到使用下面这个链接下载。
+curl -L https://raw.githubusercontent.com/wayneeseguin/rvm/master/binscripts/rvm-installer | bash -s stable
+source /usr/local/rvm/scripts/rvm  ##配置一次性变量，这里terminal暂时使用一下。熟悉的朋友可以直接配进bashrc自启
+</pre>
+<p>期间会安装各种依赖包，等待一段时间后出现complete字样即成功安装。</p>
+<h2 id="2-ruby-安装">2. ruby 安装</h2>
+<p>接着就是换源，老外网真的慢- -没办法</p>
+<pre class="brush:python;toolbar:false">
+sudo apt install curl
+#切换rvm源 
+echo "ruby_url=https://cache.ruby-china.org/pub/ruby" &gt; ~/.rvm/user/db
+此处本菜机子的是.rvmrc，直接把url导入：
+echo "ruby_url=https://cache.ruby-china.org/pub/ruby" &gt; /root/.rvmrc
+#安装ruby
+rvm list know            #查询已知rvm软件列表
+rvm install "ruby-2.5.5"   #安装ruby
+rvm use 2.5.5          #指定使用的ruby版本号
+</pre>
+<h2 id="3-配置ruby-gems环境">3. 配置ruby-gems环境</h2>
+<pre class="brush:python;toolbar:ture">
+#配置前确认：
+rvm -v
+rvm 1.29.9 (latest) by Michal Papis, Piotr Kuczynski, Wayne E. Seguin [https://rvm.io]
+gem -v
+3.0.6
+ruby -v
+ruby -v
+ruby 2.5.5p157 (2019-03-15 revision 67260) [x86_64-linux]
+gem source -l
+gem sources --remove https://rubygems.org/
+gem sources -a https://gems.ruby-china.com  ##换源 换源 换源
+gem update --system
+gem install bundler
+</pre>
+
+<h2 id="4-安装jekyll">4. 安装jekyll</h2>
+
+<p><code class="highlighter-rouge">gem install jekyll</code>
+安装jekyll工具，保证jekyll能顺畅运行。此处跟每个人下载的模板不一样所需要的工具不一样，我这里把基本的一些工具贴上，后期模板不一样看一下环境要求根据要求即可。</p>
+<pre class="brush:python;toolbar:ture">
+gem install bundler      #打包用工具
+gem install jekyll-paginate #分页设置工具 重要 一定要安装
+gem install minima      #默认主题
+gem install jekyll-feed #订阅用的工具
+</pre>
+
+<h2 id="5-启动服务">5. 启动服务</h2>
+<p>一般你们都是直接下载了模板，模板解压后进入文件夹即可。比如我这里模板文件夹叫blog</p>
+<pre class="brush:python;toolbar:ture">
+unzip blog.zip
+cd blog/
+git init #如果你有多个模板，记得先用这个命令，把当前文件夹当做根目录；同理使用其他模板第一步输入这个命令
+jekyll serve -P 80   #自动构建并运行jekyll服务
+</pre>
+<h2 id="6-jekyll报错">6. jekyll报错</h2>
+<pre class="brush:python;toolbar:ture">
+1.jekyll-paginate使用失败 即使是安装了jekyll-paginate，也会报错。
+gem list --local | grep jekyll-paginate #查看本地gem安装插件
+确认安装上，在博客根目录下编辑Gemfile，添加：gem 'jekyll-paginate', group: :jekyll_plugins
+
+2.cannot load such file -- kramdown-parser-gfm (LoadError)
+安装即可。安装 kramdown-parser-gfm ，不要分开一个一个安装。
+</pre>
+<p>现在jekyll服务启动后，web的服务是使用WEBrick服务器，会有以下让我觉得不舒服的地方：<br />
+1）目录遍历<br />
+2）无法隐藏服务器版本号
+（也许是能够这样操作但是我没有发现），所以试了下发现nginx也是可以的<br />
+链接传送门：###</p>
+:ET

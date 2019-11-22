@@ -1,0 +1,48 @@
+jekyll安装
+sudo apt install curl
+安装rvm
+#sudo apt install 
+curl -sSL https://get.rvm.io | sudo bash -s stable
+配置一次性环境变量,否则会提示找不到命令:
+source /etc/profile.d/rvm.sh
+切换rvm源 echo "ruby_url=https://cache.ruby-china.org/pub/ruby" > ~/.rvm/user/db
+此处本菜的是.rvmrc，直接把url导入。
+
+安装ruby
+
+rvm list know    #查询一直rvm软件列表
+rvm install "ruby-2.5.5"   #安装ruby
+
+
+4、安装rubygems环境
+
+gem source -l
+gem sources --remove https://rubygems.org/
+gem sources -a https://gems.ruby-china.com
+gem update --system
+
+5、安装jekyll
+
+gem install jekyll
+
+6、安装jekyll4剑客，保证jekyll能顺畅运行，官网教程太简略了
+
+gem install bundler #打包用工具
+gem install jekyll-paginate #分页设置工具
+gem install minima  #默认主题
+gem install jekyll-feed #订阅用的工具
+
+7运行Jekyll
+
+一般在home目录下，输入如下命令：
+
+jekyll new myblog  #myblog是你自己起的名字
+cd myblog      	 #进入你的博客目录
+jekyll serve -P 80   #自动构建并运行jekyll服务
+
+这时候在地址栏输入http:127.0.0.1就可以查看自己辛辛苦苦搭建的博客了。
+现在jekyll的web的服务是使用WEBrick服务器，会有以下让我觉得不舒服的地方：
+1.目录遍历
+2.无法隐藏服务器版本号
+（也许是能够这样操作但是我没有发现），所以试着搜了搜能不能和nginx链接，惊喜的发现居然可以。
+链接传送门：url

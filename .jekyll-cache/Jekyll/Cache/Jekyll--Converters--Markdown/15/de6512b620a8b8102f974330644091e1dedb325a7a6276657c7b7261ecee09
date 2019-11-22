@@ -1,0 +1,50 @@
+I"%<blockquote>
+  <p>摘要:最近在网上冲浪看到一个开源蜜罐项目，看到是基于web的蜜罐项目，web页面是真好看。突发奇想正好手头有个公网ip，最近也在为论文数据来源发愁，索性来试试看。
+先说结论，安装失败。本篇持续更新～（滑稽）</p>
+</blockquote>
+
+<p>Ubuntu 14.04 16.04 (使用apt-get进行安装)</p>
+
+<p>step 1: 安装必要的一些系统工具</p>
+
+<pre class="brush:python;toolbar:false">
+sudo apt-get update
+sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+</pre>
+
+<p>step 2: 安装GPG证书</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg</td>
+      <td>sudo apt-key add -</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Step 3: 写入软件源信息</p>
+
+<pre class="brush:python;toolbar:false">
+sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+</pre>
+
+<p>Step 4: 更新并安装 Docker-CE</p>
+
+<p>sudo apt-get -y update
+sudo apt-get -y install docker-ce</p>
+
+<p>docker run -it -p 80:80 ubuntu /bin/bash
+docker commit -a “runoob.com” -m “my apache” a404c6c174a2  mymysql:v1
+e</p>
+<h2 id="docker中netselect-apt报错">docker中netselect-apt报错.</h2>
+<p>https://packages.debian.org/buster/i386/netselect
+1.安装netselect_0.3.ds1-28+b1_amd64.deb
+http://ftp.cn.debian.org/debian/pool/main/n/netselect/netselect_0.3.ds1-28+b1_amd64.deb</p>
+
+<p>解决”Can’t locate Term/ReadLine.pm”错误问题    安装:apt install libterm-readkey-perl -y
+No usable dialog-like program is installed 安装:apt install dialog
+2.netselect-apt_0.3.ds1-28_all.deb
+http://ftp.cn.debian.org/debian/pool/main/n/netselect/netselect-apt_0.3.ds1-28_all.deb
+上述包安装完即可安装2</p>
+:ET

@@ -1,0 +1,32 @@
+I"�<h1 id="序言">序言</h1>
+<p>hello,各位看官。最近忙里偷闲花了两天时间测试入侵了一个linux靶机，遂记录下。这个靶机我觉得挺适合刚入门的有一些基础的白帽子，对就是你！，大部分flag都是利用一些工具来获得。大佬看客笑看便是（手动狗头）。
+整篇记录的都是小弟的思路，看官们跟着小弟的思路看就是了，会有些乱。见笑。</p>
+<h2 id="一靶机">一、靶机</h2>
+<p>靶机来自vulnhub，下载地址如下：</p>
+<div class="language-applescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nv">PumpkinRaising</span><span class="p">:</span><span class="w">
+</span><span class="nv">Download</span><span class="w"> </span><span class="p">(</span><span class="nv">Mirror</span><span class="p">):</span><span class="w"> </span><span class="nv">https</span><span class="p">:</span><span class="o">//</span><span class="nv">download</span><span class="p">.</span><span class="nv">vulnhub</span><span class="p">.</span><span class="nv">com</span><span class="o">/</span><span class="nv">missionpumpkin</span><span class="o">/</span><span class="nv">PumpkinRaising</span><span class="p">.</span><span class="nv">ova</span><span class="w">
+</span><span class="nv">Download</span><span class="w"> </span><span class="p">(</span><span class="nv">Torrent</span><span class="p">):</span><span class="w"> </span><span class="nv">https</span><span class="p">:</span><span class="o">//</span><span class="nv">download</span><span class="p">.</span><span class="nv">vulnhub</span><span class="p">.</span><span class="nv">com</span><span class="o">/</span><span class="nv">missionpumpkin</span><span class="o">/</span><span class="nv">PumpkinRaising</span><span class="p">.</span><span class="nv">ova</span><span class="p">.</span><span class="nv">torrent</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
+<h2 id="二实战">二、实战</h2>
+<h5 id="21-端口扫描">2.1 端口扫描</h5>
+<p>江湖规矩，神器开路：首先先用Nmap扫描确定靶机地址。发现开放的靶机ip。
+<img src="https://p0.ssl.qhimg.com/t010c1840c959e8134a.png" alt="" />
+扫描一波（-O -A狗头）：
+<img src="https://p3.ssl.qhimg.com/t01ff194e901205f336.png" alt="" />
+咱们发现没有多余的端口开放，中规中矩，22,80端口。附带扫出80端口下的robots.txt。小弟一个激灵，这么多？心里美滋滋一个一个打开看，不急，这次怕是十拿九稳（狗头）。22端口先不管他，小弟看到这么多内容的robots文件夹，如获至宝赶紧打开，我的乖，目录图片文件路径，先看看文件选项有没有什么线索。
+<img src="https://p3.ssl.qhimg.com/t01baf77d7e52ab7671.png" alt="" /><img src="https://p2.ssl.qhimg.com/t01592ff5c4fb16339d.png" alt="" /></p>
+<h4 id="22-端口踩点顺藤摸瓜">2.2 端口“踩点”——顺藤摸瓜</h4>
+<p>小弟试下来后发现文件只有如下能够访问：
+ 1）underconstruction.html：
+（页面名意还在建设的页面）提示我们说图片下面有猫腻。咱们先把这个uc.gif图片下载下来试试水。
+<img src="https://p5.ssl.qhimg.com/t0187d8d32b5c34eab1.png" alt="" />
+正好小弟最近在研究图片隐写，丢到Stegsolve查看一波。跟普通图片差不多Alpha P 1-7都是空白
+<img src="https://p2.ssl.qhimg.com/t01deeefa1b992646e8.png" alt="" />
+翻了又翻觉得RedP6、7有点异常，打开数据抽取查看源码没有收获（原谅小弟，小弟是noob~）；尝试了GRB各种组合，各种低0位，也尝试了提取bin都未提取出有用的信息。
+<img src="https://p4.ssl.qhimg.com/t0119028a6f161c523b.png" alt="" />
+忽然想到这个图片是gif，会不会有偏移呢？赶紧Stereogram Slover尝试偏移，不出所料也失败了，就这样在这张图片上浪费了不少时间。<img src="https://p4.ssl.qhimg.com/t0121b77613838ce873.png" alt="" />
+既然找不到有用的信息，那么这张图片先放一放。。不急，先往后面看。继续通过robots文件的内容查看。</p>
+:ET
